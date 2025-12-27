@@ -13,34 +13,41 @@ import seaborn as sns
 from PIL import Image
 import cv2
 
-# 한글 폰트 설정 (macOS)
+# 한글 폰트 설정 (Windows - 바탕 폰트 우선)
 import matplotlib.font_manager as fm
 import matplotlib
 
-# 한글 폰트가 제대로 나오지 않을 때 강제로 NanumGothic 등 설치된 한글 폰트 사용
-import matplotlib.font_manager as fm
-import matplotlib.pyplot as plt
+def set_korean_font():
+    """윈도우 환경에서 바탕 폰트를 우선적으로 사용하는 한글 폰트 설정"""
+    font_list = [f.name for f in fm.fontManager.ttflist]
+    
+    # 윈도우 환경에서 바탕 폰트 우선, 그 다음 다른 한글 폰트
+    preferred_fonts = [
+        'Batang',           # 바탕 (영문명)
+        'BatangChe',        # 바탕체
+        'Malgun Gothic',    # 맑은 고딕
+        'Gulim',            # 굴림
+        'Dotum',            # 돋움
+        'NanumGothic',      # 나눔고딕 (설치된 경우)
+        'Noto Sans CJK KR', # Noto Sans (설치된 경우)
+    ]
+    
+    for font_name in preferred_fonts:
+        if font_name in font_list:
+            plt.rcParams['font.family'] = font_name
+            matplotlib.rc('font', family=font_name)
+            print(f"[폰트 적용] 한글 폰트: {font_name}")
+            break
+    else:
+        # 위 폰트가 모두 없으면 기본 폰트로
+        plt.rcParams['font.family'] = 'DejaVu Sans'
+        matplotlib.rc('font', family='DejaVu Sans')
+        print("[경고] 한글 폰트가 적용되지 않을 수 있습니다.")
+    
+    plt.rcParams['axes.unicode_minus'] = False
+    matplotlib.rcParams['axes.unicode_minus'] = False
 
-try:
-    # Matplotlib의 캐시 디렉토리 경로 가져오기
-    cache_dir = matplotlib.get_cachedir()
-    print(f"Matplotlib 캐시 디렉토리: {cache_dir}")
-
-    # 캐시 디렉토리 내의 폰트 캐시 파일 (fontlist-vXXX.json) 삭제
-    for f in os.listdir(cache_dir):
-        if f.startswith('fontlist') and f.endswith('.json'):
-            file_path = os.path.join(cache_dir, f)
-            os.remove(file_path)
-            print(f"삭제된 캐시 파일: {file_path}")
-
-    print("\n[성공] 폰트 캐시를 삭제했습니다.")
-    print("--- [!! 매우 중요 !!] ---")
-    print("Jupyter Notebook, VSCode 등 사용 중인 환경의 '커널'을 '다시 시작'하세요.")
-    print("커널 재시작 후, 아래 '수정된 폰트 설정 코드'를 실행해 주세요.")
-
-except Exception as e:
-    print(f"[오류] 캐시 파일 삭제 중 오류 발생: {e}")
-    print("캐시 디렉토리로 직접 이동하여 'fontlist-vXXX.json' 파일을 수동으로 삭제해 주세요.")
+set_korean_font()
 
 # 데이터 경로
 TRAINING_PATH = '/Users/jonabi/Downloads/JLK_DATA/Training'

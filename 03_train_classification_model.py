@@ -236,30 +236,38 @@ def create_dataloaders(train_df, val_df, test_df, batch_size=32, num_workers=4, 
     
     return train_loader, val_loader, test_loader, train_dataset
 
-# 한글 폰트 설정 (macOS)
+# 한글 폰트 설정 (Windows - 바탕 폰트 우선)
 import matplotlib.font_manager as fm
 import matplotlib
 
-# 한글 폰트 설정 함수 (한글 깨짐 방지)
 def set_korean_font():
-    import matplotlib
-    import matplotlib.pyplot as plt
-    import matplotlib.font_manager as fm
+    """윈도우 환경에서 바탕 폰트를 우선적으로 사용하는 한글 폰트 설정"""
     font_list = [f.name for f in fm.fontManager.ttflist]
-    # 선호 순서대로 폰트 리스트
+    
+    # 윈도우 환경에서 바탕 폰트 우선, 그 다음 다른 한글 폰트
     preferred_fonts = [
-        'Apple SD Gothic Neo', 'AppleGothic', 'NanumGothic', 'Malgun Gothic',
-        '돋움', 'Arial Unicode MS', 'Noto Sans CJK KR', 'Pretendard'
+        'Batang',           # 바탕 (영문명)
+        'BatangChe',        # 바탕체
+        'Malgun Gothic',    # 맑은 고딕
+        'Gulim',            # 굴림
+        'Dotum',            # 돋움
+        'NanumGothic',      # 나눔고딕 (설치된 경우)
+        'Noto Sans CJK KR', # Noto Sans (설치된 경우)
     ]
+    
     for font_name in preferred_fonts:
         if font_name in font_list:
             matplotlib.rc('font', family=font_name)
-            print(f'[폰트적용] 한글 폰트: {font_name}')
+            plt.rcParams['font.family'] = font_name
+            print(f'[폰트 적용] 한글 폰트: {font_name}')
             break
     else:
         matplotlib.rc('font', family='DejaVu Sans')
+        plt.rcParams['font.family'] = 'DejaVu Sans'
         print('[경고] 한글 폰트가 없어서 기본 폰트(DejaVu Sans)가 적용됩니다. 한글이 네모(□)로 보일 수 있습니다.')
+    
     matplotlib.rcParams['axes.unicode_minus'] = False
+    plt.rcParams['axes.unicode_minus'] = False
 
 set_korean_font()
 
